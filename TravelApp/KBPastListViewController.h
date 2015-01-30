@@ -1,0 +1,13 @@
+//
+//  KBPastListViewController.h
+//  TravelApp
+//
+//  Created by Johnny Coster on 3/17/14.
+//  Copyright (c) 2014 KaBliss. All rights reserved.
+//
+
+#import "KBListViewController.h"
+
+@interface KBPastListViewController : KBListViewController
+
+@end

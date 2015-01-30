@@ -1,0 +1,17 @@
+Database file: travelApp.db
+
+create table kb_location(id integer primary key autoincrement,
+                        city text,
+                        country text not null,
+                        countryCode text,
+                        latitude real not null,
+                        longitude real not null);
+
+create table kb_pin(id integer primary key autoincrement,
+                        locationId integer unique,
+                        date text,
+                        places text,
+                        notes text,
+                        color varchar(15),
+                        type varchar(15),
+                        foreign key(locationId) references kb_location(id));
