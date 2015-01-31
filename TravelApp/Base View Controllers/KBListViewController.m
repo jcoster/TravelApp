@@ -8,6 +8,7 @@
 
 #import "KBListViewController.h"
 #import "KBDetailViewController.h"
+#import "KBMapViewController.h"
 #import "KBDataManager.h"
 
 @interface KBListViewController ()
@@ -75,9 +76,42 @@ const int ESOTERIC_ROW_THRESHOLD = 10;
     } else {
         KBPin *pin = [self.pins objectAtIndex:indexPath.row];
         cell.textLabel.text = pin.location.country;
+        cell.imageView.image = [self getFlagForCountry:pin.location];
     }
     
     return cell;
+}
+                          
+-(UIImage *)getFlagForCountry:(KBLocation *)location {
+    KBMapViewController *controller = (KBMapViewController *)[self.navigationController.viewControllers firstObject];
+
+    // set map to max zoom to make sure we get the flag correct
+    // (flag needs accurate point from map which is tough when zoomed out)
+    float initialZoom = controller.mapView.zoom;
+    [controller.mapView setZoom:5];
+
+    RMMBTilesSource *source = (RMMBTilesSource *) controller.mapView.tileSource;
+
+    if ([source conformsToProtocol:@protocol(RMInteractiveSource)] && [source supportsInteractivity]) {
+      
+      NSString *formattedOutput = [source formattedOutputOfType:RMInteractiveSourceOutputTypeTeaser forPoint:[controller.mapView coordinateToPixel:CLLocationCoordinate2DMake([location.latitude floatValue], [location.longitude floatValue])] inMapView:controller.mapView];
+      
+      if (formattedOutput && [formattedOutput length]) {
+          // parse the flag url out of the content
+          NSUInteger startOfFlagImage = [formattedOutput rangeOfString:@"base64,"].location + [@"base64," length];
+          NSUInteger endOfFlagImage = [formattedOutput rangeOfString:@"\" style"].location;
+          
+          // restore map to original zoom
+          [controller.mapView setZoom:initialZoom];
+          
+          return [UIImage imageWithData:[[NSData alloc] initWithBase64EncodedString:[formattedOutput substringWithRange:NSMakeRange(startOfFlagImage, endOfFlagImage - startOfFlagImage)] options:NSDataBase64DecodingIgnoreUnknownCharacters]];
+      }
+    }
+
+    // restore map to original zoom
+    [controller.mapView setZoom:initialZoom];
+
+    return nil;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
