@@ -21,4 +21,4 @@ Screenshots
 ![Detail View](https://raw.githubusercontent.com/jcoster/TravelApp/master/screenshots/TravelApp%20-%20Detail.png)
 
 Developer: Johnny Coster<br/>
-Project consultant: Katie Woo
+Designer: Katie Coster
